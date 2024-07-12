@@ -130,13 +130,13 @@ tidymodl <- R6::R6Class("tidymodl",
   cmd <- paste0("df <- df |> complete(", paste(obs_fields, collapse = ","), ")")
   eval(parse(text = cmd))
   key = .get_key(df, pivot_column)
-  df = df |> left_join(key, by = pivot_column) %>%
+  df = df |> left_join(key, by = pivot_column) |>
     select(-all_of(pivot_column))
   obs_fields = setdiff(names(df), c("vid", pivot_value))
-  y = decompose_table(df, id, all_of(obs_fields))
+  y = decompose_table(df, "id", all_of(obs_fields))
   y$matrix = y$child_table |>
     pivot_wider(names_from = .data$vid, values_from = .data$value)
-  df = df %>% left_join(y$parent_table, by = c("iso3c", "year")) %>%
+  df = df |> left_join(y$parent_table, by = c("iso3c", "year")) |>
     left_join(key, by = "vid")
   tmp = list(mat = y$matrix, master = df)
   return(tmp)
