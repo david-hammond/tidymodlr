@@ -75,6 +75,7 @@ tidymodl <- R6::R6Class("tidymodl",
                                 self$mdldata = tmp$mat[,-1]
                                 private$key_ind = tmp$mat$id
                                 private$master = tmp$master
+                                private$key = tmp$key
                               },
                               #' @description
                               #' Adds a results matrix
@@ -92,11 +93,20 @@ tidymodl <- R6::R6Class("tidymodl",
                                   df = self$data
                                 }
                                 return(df)
+                              },
+                              #' @description
+                              #' Prints the key and the head matrix
+                              print = function() {
+                                cat("Variable Key: \n")
+                                print(private$key)
+                                cat("Head Data Matrix: \n")
+                                print(head(self$mdldata, 5))
                               }
                             ),
                         private = list(
                           master = NULL,
-                          key_ind = NULL
+                          key_ind = NULL,
+                          key = NULL
                         )
 )
 
@@ -138,7 +148,7 @@ tidymodl <- R6::R6Class("tidymodl",
     pivot_wider(names_from = .data$vid, values_from = .data$value)
   df = df |> left_join(y$parent_table, by = c("iso3c", "year")) |>
     left_join(key, by = "vid")
-  tmp = list(mat = y$matrix, master = df)
+  tmp = list(mat = y$matrix, master = df, key = key)
   return(tmp)
 }
 
