@@ -62,6 +62,7 @@ The model matrix version of the data}
 \itemize{
 \item \href{#method-tidymodl-new}{\code{tidymodl$new()}}
 \item \href{#method-tidymodl-reconstitute}{\code{tidymodl$reconstitute()}}
+\item \href{#method-tidymodl-print}{\code{tidymodl$print()}}
 \item \href{#method-tidymodl-clone}{\code{tidymodl$clone()}}
 }
 }
@@ -108,6 +109,16 @@ Adds a results matrix
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-tidymodl-print"></a>}}
+\if{latex}{\out{\hypertarget{method-tidymodl-print}{}}}
+\subsection{Method \code{print()}}{
+Prints the key and the head matrix
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{tidymodl$print()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-tidymodl-clone"></a>}}
