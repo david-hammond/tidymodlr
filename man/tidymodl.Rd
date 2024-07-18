@@ -14,10 +14,10 @@ Creates a model matrix style R6 class for modelling with long tidy data
 \examples{
 data(wb)
 mdl <- tidymodl$new(wb,
-                    pivot_column = "indicator",
-                    pivot_value = "value")
+                   pivot_column = "indicator",
+                  pivot_value = "value")
 ### Use mdldata for modelling
-fit = lm(data = mdl$mdldata, gni ~ gcu + ppt)
+fit <- lm(data = mdl$child, gni ~ gcu + ppt)
 
 ### Can be used to add a yhat value for processed data
 
@@ -26,24 +26,24 @@ fit = lm(data = mdl$mdldata, gni ~ gcu + ppt)
 ### NOT RUN
 # Use for xgboost imputation
 # library(mixgb)
-# imp = mixgb(mdl$mdldata, save.models = T)
-# tmp = mdl$reconstitute(imp$imputed.data[[1]])
+# imp <- mixgb(mdl$child, save.models = T)
+# tmp <- mdl$assemble(newdata = imp$imputed.data[[1]])
 
 ### NOT RUN
 # Use for mice imputation
 # library(mice)
-# imp = mice(as.data.frame(scale(mdl$matrix)), print = FALSE)
-# tmp = mdl$reconstitute(complete(imp))
+# imp <- mice(as.data.frame(scale(mdl$matrix)), print = FALSE)
+# tmp <- mdl$assemble(complete(imp))
 
 ### In this example we will just use dummy new data
-nc = ncol(mdl$mdldata)
-nr = nrow(mdl$mdldata)
-dm = nc*nr
-dummy = matrix(runif(dm),
+nc <- ncol(mdl$child)
+nr <- nrow(mdl$child)
+dm <- nc*nr
+dummy <- matrix(runif(dm),
         ncol = nc) |>
         data.frame()
-names(dummy) = names(mdl$mdldata)
-tmp = mdl$reconstitute(dummy)
+names(dummy) = names(mdl$child)
+tmp = mdl$assemble(dummy)
 
 }
 \section{Public fields}{
@@ -52,7 +52,7 @@ tmp = mdl$reconstitute(dummy)
 \item{\code{data}}{(\code{data.frame()})\cr
 The original tidy long data frame}
 
-\item{\code{mdldata}}{(\code{data.frame()})\cr
+\item{\code{child}}{(\code{data.frame()})\cr
 The model matrix version of the data}
 }
 \if{html}{\out{</div>}}
@@ -61,7 +61,7 @@ The model matrix version of the data}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-tidymodl-new}{\code{tidymodl$new()}}
-\item \href{#method-tidymodl-reconstitute}{\code{tidymodl$reconstitute()}}
+\item \href{#method-tidymodl-assemble}{\code{tidymodl$assemble()}}
 \item \href{#method-tidymodl-print}{\code{tidymodl$print()}}
 \item \href{#method-tidymodl-clone}{\code{tidymodl$clone()}}
 }
@@ -94,18 +94,18 @@ A new \code{tidymodl} object.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-tidymodl-reconstitute"></a>}}
-\if{latex}{\out{\hypertarget{method-tidymodl-reconstitute}{}}}
-\subsection{Method \code{reconstitute()}}{
+\if{html}{\out{<a id="method-tidymodl-assemble"></a>}}
+\if{latex}{\out{\hypertarget{method-tidymodl-assemble}{}}}
+\subsection{Method \code{assemble()}}{
 Adds a results matrix
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{tidymodl$reconstitute(m = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{tidymodl$assemble(newdata = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{m}}{A results matrix}
+\item{\code{newdata}}{A results matrix}
 }
 \if{html}{\out{</div>}}
 }
