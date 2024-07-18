@@ -148,22 +148,6 @@ tidymodl <- R6::R6Class("tidymodl",
                         )
 )
 
-#' Get pivot_column key data frame
-#'
-#' @param tmp A long data frame
-#' @param pivot_column The column name on which the pivot will occur
-#'
-#'
-#' @keywords internal
 
-
-
-#' Get pivot_column key data frame
-#'
-#' @param df A long data frame
-#' @param pivot_column The column name on which the pivot will occur
-#' @param pivot_value The column name of the values to be pivoted
-#'
-#' @keywords internal
 
 
