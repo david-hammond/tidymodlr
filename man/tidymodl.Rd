@@ -60,6 +60,8 @@ The model matrix version of the data}
 \item \href{#method-tidymodl-new}{\code{tidymodl$new()}}
 \item \href{#method-tidymodl-assemble}{\code{tidymodl$assemble()}}
 \item \href{#method-tidymodl-print}{\code{tidymodl$print()}}
+\item \href{#method-tidymodl-correlate}{\code{tidymodl$correlate()}}
+\item \href{#method-tidymodl-xgb_impute}{\code{tidymodl$xgb_impute()}}
 \item \href{#method-tidymodl-clone}{\code{tidymodl$clone()}}
 }
 }
@@ -116,6 +118,33 @@ Prints the key and the head matrix
 \if{html}{\out{<div class="r">}}\preformatted{tidymodl$print()}\if{html}{\out{</div>}}
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-tidymodl-correlate"></a>}}
+\if{latex}{\out{\hypertarget{method-tidymodl-correlate}{}}}
+\subsection{Method \code{correlate()}}{
+Correlates and reurns pearson values
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{tidymodl$correlate()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-tidymodl-xgb_impute"></a>}}
+\if{latex}{\out{\hypertarget{method-tidymodl-xgb_impute}{}}}
+\subsection{Method \code{xgb_impute()}}{
+Provides high level xgboost imputation
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{tidymodl$xgb_impute(n = 5)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{n}}{The number of cross-validation folds to perform}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-tidymodl-clone"></a>}}

@@ -4,6 +4,8 @@
 #' @importFrom dplyr select left_join all_of rename
 #' @importFrom tidyr pivot_wider pivot_longer complete
 #' @importFrom tm removePunctuation removeWords stopwords
+#' @importFrom corrr correlate autoplot
+#' @importFrom mixgb mixgb
 #' @param df A tidy long data frame
 #' @param pivot_column The column name on which the pivot will occur
 #' @param pivot_value The column name of the values to be pivotted
@@ -55,6 +57,7 @@ tidymodl <- R6::R6Class("tidymodl",
   public = list(
     data = NULL,
     child = NULL,
+    key = NULL,
     #' @description
     #' Create a new tidymodl object.
     #' @param df A tidy long data frame
@@ -64,10 +67,11 @@ tidymodl <- R6::R6Class("tidymodl",
     initialize = function(df,
                           pivot_column,
                           pivot_value) {
-      self$data <- df
+      self$data <- as.data.frame(df)
       private$pivot_column <- pivot_column
       private$pivot_value <- pivot_value
-      private$key <- private$.get_key()
+      self$key <- key_value_table(self$data[, private$pivot_column])
+      names(self$key)[2] = private$pivot_column
       tmp <- private$.get_dm()
       self$child <- tmp$child
       private$parent <- tmp$parent
@@ -80,20 +84,20 @@ tidymodl <- R6::R6Class("tidymodl",
         cbind(self$child)
       parent <- parent |>
         pivot_longer(!eval(names(private$parent)),
-                     names_to = "hashkey",
+                     names_to = "key",
                      values_to = private$pivot_value) |>
-        left_join(private$key, by = "hashkey") |>
-        select(-hashkey)
+        left_join(self$key, by = "key") |>
+        select(-key)
       parent <- parent[, c(names(self$data))]
       if (!is.null(newdata)) {
         child <- private$parent |>
           cbind(newdata)
         child <- child |>
           pivot_longer(!eval(names(private$parent)),
-                       names_to = "hashkey",
+                       names_to = "key",
                        values_to = "yhat") |>
-          left_join(private$key, by = "hashkey") |>
-          select(-hashkey)
+          left_join(self$key, by = "key") |>
+          select(-key)
         child <- child[, c(setdiff(names(self$data),
                                    private$pivot_value),
                            "yhat")]
@@ -107,38 +111,43 @@ tidymodl <- R6::R6Class("tidymodl",
     #' @description
     #' Prints the key and the head matrix
     print = function() {
-      cat("Variable Key: \n")
-      print(private$key)
-      cat("Head Data Matrix: \n")
+      cat("Key: \n")
+      print(self$key)
+      cat("Matrix: \n")
       print(head(self$child, 5))
+    },
+    #' @description
+    #' Correlates and reurns pearson values
+    correlate = function() {
+      cat("Variable Key: \n")
+      print(self$key)
+      x <- correlate(self$child)
+      print(autoplot(x))
+      return(x)
+    },
+    #' @description
+    #' Provides high level xgboost imputation
+    #' @param n The number of cross-validation folds to perform
+    xgb_impute = function(n = 5){
+      tmp <- mixgb(mdl$child, m = n)
+      tmp <- lapply(tmp, as.data.frame)
+      tmp <- Reduce('+', tmp)/length(tmp)
+      tmp <- self$assemble(tmp)
+      return(tmp)
     }
   ),
   private = list(
     master = NULL,
-    key_ind = NULL,
-    key = NULL,
     pivot_column = NULL,
     pivot_value = NULL,
-    .get_key = function() {
-      key <- data.frame(variable = unique(self$data[, private$pivot_column]),
-                        hashkey = apply(unique(self$data[,
-                                                         private$pivot_column]),
-                                        1, tolower))
-      names(key)[1] <- private$pivot_column
-      key$hashkey <- tm::removePunctuation(key$hashkey)
-      key$hashkey <- tm::removeWords(key$hashkey, words = stopwords())
-      key$hashkey <- abbreviate(key$hashkey, minlength = 3)
-      key$hashkey <- make.unique(key$hashkey)
-      return(key)
-    },
     .get_dm = function() {
       parent_cols <- setdiff(names(self$data), c(private$pivot_column,
                                                  private$pivot_value))
       df <- self$data |>
-        left_join(private$key, by = private$pivot_column) |>
+        left_join(self$key, by = private$pivot_column) |>
         select(-all_of(private$pivot_column))
       df <- df |>
-        pivot_wider(names_from = hashkey,
+        pivot_wider(names_from = key,
                     values_from = eval(private$pivot_value))
       parent <- df |> select(eval(parent_cols))
       child <- df |> select(-eval(parent_cols))
@@ -147,3 +156,28 @@ tidymodl <- R6::R6Class("tidymodl",
     }
   )
 )
+
+#' Generate a key value table with unique key for a set of text
+#'
+#' Given a vector of characters, this will return a data frame of
+#' a unique `key` column (of, where possible, 3 characters) and `value`
+#' column listing the unique elements of the original `text`.
+#'
+#' @param text The text to abbreviate and create a key value table for
+#'
+#' @examples
+#' data(wb)
+#' key_value_table(wb$indicator)
+#' @export
+
+key_value_table = function(text) {
+  text <- as.character(text)
+  key <- data.frame(key = tolower(unique(text)),
+                    value = unique(text))
+  key$key <- removePunctuation(key$key)
+  key$key <- removeWords(key$key, words = stopwords())
+  key$key <- abbreviate(key$key, minlength = 3)
+  key$key <- abbreviate(make.unique(key$key), minlength = 3)
+  key$key = gsub("\\.", "", key$key)
+  return(key)
+}
