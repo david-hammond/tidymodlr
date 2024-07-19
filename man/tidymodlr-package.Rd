@@ -6,14 +6,19 @@
 \alias{tidymodlr-package}
 \title{\code{tidymodlr}: Modelling with tidy long data}
 \description{
-\code{tidymodlr} makes modelling using tidy long data easier. In many fields
-it is common to have data in tidy long data, with the rows representing many
-variables, but only \strong{one} one column representing the values (see
-\code{?wb} for an example).
-}
-\details{
 \code{tidymodlr} transforms long data into a matrix form to allow for ease
 of input into modelling packages or for regression style analysis.
+}
+\details{
+In many fields #' it is common to have data in tidy long data, with
+the rows representing many #' variables, but only \strong{one}
+column representing the values (see #' \code{?wb} for an example).
+
+\code{tidymodlr} is particularly useful when the variablenames in the columns
+are long descriptive strings, for example 'Energy imports, net (\% of energy use)'.
+In such cases a straight \verb{pivot wider} generates column names that are
+not only cumbersome, but also generate errors in many standard modelling packages
+that require \code{base} column names.
 }
 \author{
 \strong{Maintainer}: First Last \email{first.last@example.com} (\href{https://orcid.org/YOUR-ORCID-ID}{ORCID})

@@ -1,10 +1,10 @@
 #' Creates a model matrix style R6 class for modelling with long tidy data
 #'
 #' @importFrom R6 R6Class
-#' @importFrom dplyr select left_join all_of rename
+#' @importFrom dplyr select left_join all_of rename arrange
 #' @importFrom tidyr pivot_wider pivot_longer complete
 #' @importFrom tm removePunctuation removeWords stopwords
-#' @importFrom corrr correlate autoplot
+#' @importFrom corrr correlate autoplot dice
 #' @importFrom mixgb mixgb
 #' @param df A tidy long data frame
 #' @param pivot_column The column name on which the pivot will occur
@@ -53,6 +53,9 @@ tidymodl <- R6::R6Class("tidymodl",
   #'   The original tidy long data frame
   #' @field child (`data.frame()`)\cr
   #'   The model matrix version of the data
+  #' @field key (`data.frame()`)\cr
+  #'   A `key value` table that links the parent
+  #'   and child data.frames.
   lock_objects = FALSE,
   public = list(
     data = NULL,
@@ -67,7 +70,10 @@ tidymodl <- R6::R6Class("tidymodl",
     initialize = function(df,
                           pivot_column,
                           pivot_value) {
-      self$data <- as.data.frame(df)
+      ##CHECK FOR DUPLICATIONS
+      df[,pivot_column] = as.character( df[,pivot_column])
+      self$data <- as.data.frame(df) |>
+        arrange(eval(pivot_column))
       private$pivot_column <- pivot_column
       private$pivot_value <- pivot_value
       self$key <- key_value_table(self$data[, private$pivot_column])
@@ -119,7 +125,7 @@ tidymodl <- R6::R6Class("tidymodl",
     #' @description
     #' Correlates and reurns pearson values
     correlate = function() {
-      cat("Variable Key: \n")
+      cat("Key: \n")
       print(self$key)
       x <- correlate(self$child)
       print(autoplot(x))
@@ -151,6 +157,7 @@ tidymodl <- R6::R6Class("tidymodl",
                     values_from = eval(private$pivot_value))
       parent <- df |> select(eval(parent_cols))
       child <- df |> select(-eval(parent_cols))
+      child <- child[, self$key$key]
       tmp <- list(parent = parent, child = child)
       return(tmp)
     }
@@ -172,12 +179,13 @@ tidymodl <- R6::R6Class("tidymodl",
 
 key_value_table = function(text) {
   text <- as.character(text)
-  key <- data.frame(key = tolower(unique(text)),
-                    value = unique(text))
+  key <- data.frame(key = sort(tolower(unique(text))),
+                    value = sort(unique(text)))
   key$key <- removePunctuation(key$key)
   key$key <- removeWords(key$key, words = stopwords())
   key$key <- abbreviate(key$key, minlength = 3)
   key$key <- abbreviate(make.unique(key$key), minlength = 3)
   key$key = gsub("\\.", "", key$key)
+  key$key = factor(key$key, key$key, ordered = T)
   return(key)
 }

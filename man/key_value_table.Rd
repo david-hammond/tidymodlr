@@ -11,7 +11,7 @@ key_value_table(text)
 }
 \description{
 Given a vector of characters, this will return a data frame of
-a unique \code{key} column (where possible of 3 characters) and \code{value}
+a unique \code{key} column (of, where possible, 3 characters) and \code{value}
 column listing the unique elements of the original \code{text}.
 }
 \examples{

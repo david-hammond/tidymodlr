@@ -51,6 +51,10 @@ The original tidy long data frame}
 
 \item{\code{child}}{(\code{data.frame()})\cr
 The model matrix version of the data}
+
+\item{\code{key}}{(\code{data.frame()})\cr
+A \verb{key value} table that links the parent
+and child data.frames.}
 }
 \if{html}{\out{</div>}}
 }
