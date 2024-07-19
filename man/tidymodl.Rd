@@ -8,18 +8,24 @@ Creates a model matrix style R6 class for modelling with long tidy data
 
 Creates a model matrix style R6 class for modelling with long tidy data
 }
-\details{
-Creates a model matrix style R6 class for modelling with long tidy data
-}
 \examples{
 data(wb)
 mdl <- tidymodl$new(wb,
                    pivot_column = "indicator",
                   pivot_value = "value")
-### Use mdldata for modelling
+### Use mdl$child for modelling
 fit <- lm(data = mdl$child, gni ~ gcu + ppt)
 
 ### Can be used to add a yhat value for processed data
+
+nc <- ncol(mdl$child)
+nr <- nrow(mdl$child)
+dm <- nc * nr
+dummy <- matrix(runif(dm),
+                ncol = nc) |>
+                data.frame()
+names(dummy) = names(mdl$child)
+tmp = mdl$assemble(dummy)
 
 ### This is useful for imputation purposes as below
 
@@ -27,23 +33,14 @@ fit <- lm(data = mdl$child, gni ~ gcu + ppt)
 # Use for xgboost imputation
 # library(mixgb)
 # imp <- mixgb(mdl$child, save.models = T)
-# tmp <- mdl$assemble(newdata = imp$imputed.data[[1]])
+# tmp <- mdl$assemble(newdata = imp$imputed[[1]])
 
 ### NOT RUN
 # Use for mice imputation
 # library(mice)
-# imp <- mice(as.data.frame(scale(mdl$matrix)), print = FALSE)
+# imp <- mice(as.frame(scale(mdl$matrix)), print = FALSE)
 # tmp <- mdl$assemble(complete(imp))
 
-### In this example we will just use dummy new data
-nc <- ncol(mdl$child)
-nr <- nrow(mdl$child)
-dm <- nc*nr
-dummy <- matrix(runif(dm),
-        ncol = nc) |>
-        data.frame()
-names(dummy) = names(mdl$child)
-tmp = mdl$assemble(dummy)
 
 }
 \section{Public fields}{

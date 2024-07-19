@@ -5,7 +5,7 @@
 #' @format A data frame with 3078 rows and 4 variables
 #' \itemize{
 #'   \item \strong{iso3c:} isocode of a country.
-#'   \item \strong{indicaotr:} World Bank indicator.
+#'   \item \strong{indicator:} World Bank indicator.
 #'   \item \strong{year:} Year of observation
 #'   \item \strong{value:} Value of observation
 #' }

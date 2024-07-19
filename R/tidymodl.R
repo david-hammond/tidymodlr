@@ -1,11 +1,9 @@
 #' Creates a model matrix style R6 class for modelling with long tidy data
 #'
-#' Creates a model matrix style R6 class for modelling with long tidy data
 #' @importFrom R6 R6Class
 #' @importFrom dplyr select left_join all_of rename
 #' @importFrom tidyr pivot_wider pivot_longer complete
 #' @importFrom tm removePunctuation removeWords stopwords
-#' @importFrom rlang .data
 #' @param df A tidy long data frame
 #' @param pivot_column The column name on which the pivot will occur
 #' @param pivot_value The column name of the values to be pivotted
@@ -14,10 +12,19 @@
 #' mdl <- tidymodl$new(wb,
 #'                    pivot_column = "indicator",
 #'                   pivot_value = "value")
-#' ### Use mdldata for modelling
+#' ### Use mdl$child for modelling
 #' fit <- lm(data = mdl$child, gni ~ gcu + ppt)
 #'
 #' ### Can be used to add a yhat value for processed data
+#'
+#' nc <- ncol(mdl$child)
+#' nr <- nrow(mdl$child)
+#' dm <- nc * nr
+#' dummy <- matrix(runif(dm),
+#'                 ncol = nc) |>
+#'                 data.frame()
+#' names(dummy) = names(mdl$child)
+#' tmp = mdl$assemble(dummy)
 #'
 #' ### This is useful for imputation purposes as below
 #'
@@ -25,25 +32,15 @@
 #' # Use for xgboost imputation
 #' # library(mixgb)
 #' # imp <- mixgb(mdl$child, save.models = T)
-#' # tmp <- mdl$assemble(newdata = imp$imputed.data[[1]])
+#' # tmp <- mdl$assemble(newdata = imp$imputed[[1]])
 #'
 #' ### NOT RUN
 #' # Use for mice imputation
 #' # library(mice)
-#' # imp <- mice(as.data.frame(scale(mdl$matrix)), print = FALSE)
+#' # imp <- mice(as.frame(scale(mdl$matrix)), print = FALSE)
 #' # tmp <- mdl$assemble(complete(imp))
 #'
-#' ### In this example we will just use dummy new data
-#' nc <- ncol(mdl$child)
-#' nr <- nrow(mdl$child)
-#' dm <- nc*nr
-#' dummy <- matrix(runif(dm),
-#'         ncol = nc) |>
-#'         data.frame()
-#' names(dummy) = names(mdl$child)
-#' tmp = mdl$assemble(dummy)
 #'
-
 #' @export
 #'
 
