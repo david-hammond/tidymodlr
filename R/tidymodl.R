@@ -71,7 +71,8 @@ tidymodl <- R6::R6Class("tidymodl",
                           pivot_column,
                           pivot_value) {
       ##CHECK FOR DUPLICATIONS
-      df[,pivot_column] = as.character( df[,pivot_column])
+      df = as.data.frame(df)
+      df[,pivot_column] = factor( df[,pivot_column])
       self$data <- as.data.frame(df) |>
         arrange(eval(pivot_column))
       private$pivot_column <- pivot_column
@@ -135,7 +136,7 @@ tidymodl <- R6::R6Class("tidymodl",
     #' Provides high level xgboost imputation
     #' @param n The number of cross-validation folds to perform
     xgb_impute = function(n = 5){
-      tmp <- mixgb(mdl$child, m = n)
+      tmp <- mixgb(self$child, m = n)
       tmp <- lapply(tmp, as.data.frame)
       tmp <- Reduce('+', tmp)/length(tmp)
       tmp <- self$assemble(tmp)
@@ -184,7 +185,9 @@ key_value_table = function(text) {
   key$key <- removePunctuation(key$key)
   key$key <- removeWords(key$key, words = stopwords())
   key$key <- abbreviate(key$key, minlength = 3)
-  key$key <- abbreviate(make.unique(key$key), minlength = 3)
+  key$key <- make.names(key$key)
+  key$key <- make.unique(key$key)
+  key$key <- abbreviate(key$key, minlength = 3)
   key$key = gsub("\\.", "", key$key)
   key$key = factor(key$key, key$key, ordered = T)
   return(key)
