@@ -97,21 +97,29 @@ tidymodl <- R6::R6Class("tidymodl",
         select(-key)
       parent <- parent[, c(names(self$data))]
       if (!is.null(newdata)) {
-        child <- private$parent |>
-          cbind(newdata)
-        child <- child |>
-          pivot_longer(!eval(names(private$parent)),
-                       names_to = "key",
-                       values_to = "yhat") |>
-          left_join(self$key, by = "key") |>
-          select(-key)
-        child <- child[, c(setdiff(names(self$data),
-                                   private$pivot_value),
-                           "yhat")]
-        parent <- parent |> left_join(child,
-                                      by = c(names(private$parent),
-                                             private$pivot_column))
-        parent <- parent[, c(names(self$data), "yhat")]
+        if(identical(dim(newdata), dim(self$child))){
+          child <- private$parent |>
+            cbind(newdata)
+          child <- child |>
+            pivot_longer(!eval(names(private$parent)),
+                         names_to = "key",
+                         values_to = "yhat") |>
+            left_join(self$key, by = "key") |>
+            select(-key)
+          child <- child[, c(setdiff(names(self$data),
+                                     private$pivot_value),
+                             "yhat")]
+          parent <- parent |> left_join(child,
+                                        by = c(names(private$parent),
+                                               private$pivot_column))
+          parent <- parent[, c(names(self$data), "yhat")]
+        }else{
+          if(nrow(newdata) == nrow(self$child)){
+            parent = self$parent[, -c(private$pivot_column, private$pivot_value)]
+            parent = data.frame(parent, yhat = newdata)
+          }
+        }
+
       }
       return(parent)
     },
