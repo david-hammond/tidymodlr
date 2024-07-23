@@ -114,7 +114,7 @@ tidymodl <- R6::R6Class("tidymodl",
                                                private$pivot_column))
           parent <- parent[, c(names(self$data), "yhat")]
         }else{
-          if(nrow(newdata) == nrow(self$child)){
+          if(length(newdata) == nrow(self$child)){
             parent = self$parent[, -c(private$pivot_column, private$pivot_value)]
             parent = data.frame(parent, yhat = newdata)
           }
