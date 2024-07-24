@@ -55,7 +55,7 @@ test_that("xgb_impute returns correct values", {
   expect_true(test)
 })
 
-test_that("pca_impute returns correct values", {
+test_that("pca_impute returns correct class", {
   data(wb)
   mdl <- tidymodl$new(wb,
                       pivot_column = "indicator",

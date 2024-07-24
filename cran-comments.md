@@ -43,3 +43,27 @@ This note has been suggested not to be an issue. <https://stackoverflow.com/ques
 On running:
 
 `devtools::check_win_devel()`
+
+## Test 6: Mac
+
+On running:
+
+`devtools::check_mac_release()`
+
+I receive no errors.
+
+## Test 7: Rhub
+
+I run `rhub::rhub_setup` and `rhub::rhub_doctor()`
+
+After this all `rhub::rhub_check()` are successful except for:
+
+-   `intel` Issue Error in dyn.load(file, DLLpath = DLLpath, ...) : unable to load shared object '/github/home/R/x86_64-pc-linux-gnu-library/4.5/classInt/libs/classInt.so':
+
+    -   Ignoring as this seems to be a container issue <https://stackoverflow.com/questions/38943764/r-error-in-dyn-loadfile-dllpath-dllpath>
+
+-   `rchk` Error: bcheck output file does not exist
+
+    -   Ignoring again as this seems a container issue.
+
+        libgfortran.so.5: cannot open shared object file: No such file or directory

@@ -9,7 +9,7 @@
 #' @importFrom tidyr pivot_wider pivot_longer complete
 #' @importFrom tm removePunctuation removeWords stopwords
 #' @importFrom corrr correlate autoplot dice
-#' @importFrom mixgb mixgb
+#' @importFrom mixgb mixgb data_clean
 #' @param df A tidy long data frame
 #' @param pivot_column The column name on which the pivot will occur
 #' @param pivot_value The column name of the values to be pivotted
@@ -77,7 +77,8 @@ tidymodl <- R6::R6Class("tidymodl",
       test <- duplicated(df |> select(-pivot_value))
       if(sum(test) > 0){
         print(df[test,])
-        stop("You have duplicated data in your data.frame, check the above entires, fix and retry")
+        stop("You have duplicated data in your data.frame, check the above
+             entires, fix and retry")
       }
       df[, pivot_column] <- factor(df[, pivot_column])
       self$data <- as.data.frame(df) |>
@@ -211,12 +212,15 @@ tidymodl <- R6::R6Class("tidymodl",
     #' be "long" or "wide".
     #' @return df A data.frame of imputed values
     xgb_impute = function(n = 5, format = "long") {
+      set.seed(12345)
       stopifnot("The `format` parameter needs to be either 'long' or 'wide'" =
                   format %in% c("long", "wide"))
-      tmp <- mixgb(self$child, m = n)
+      tmp <- data_clean(self$child)
+      tmp <- mixgb(tmp, m = n, verbose = TRUE)
       tmp <- lapply(tmp, as.data.frame)
       tmp <- Reduce("+", tmp) / length(tmp)
       tmp <- self$assemble(tmp, format)
+      set.seed(NULL)
       return(tmp)
     },
     #' @description
