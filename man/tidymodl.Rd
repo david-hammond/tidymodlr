@@ -2,11 +2,13 @@
 % Please edit documentation in R/tidymodl.R
 \name{tidymodl}
 \alias{tidymodl}
-\title{Creates a model matrix style R6 class for modelling with long tidy data}
+\title{Creates a model matrix style R6 class for modelling with long tidy
+data}
 \description{
 Creates a model matrix style R6 class for modelling with long tidy data
-
-Creates a model matrix style R6 class for modelling with long tidy data
+}
+\note{
+Use Cases 1 and 3 return identical results.
 }
 \examples{
 data(wb)
@@ -48,6 +50,9 @@ tmp = mdl$assemble(dummy)
 \describe{
 \item{\code{data}}{(\code{data.frame()})\cr
 The original tidy long data frame}
+
+\item{\code{parent}}{(\code{data.frame()})\cr
+The parent identifiers of the original data}
 
 \item{\code{child}}{(\code{data.frame()})\cr
 The model matrix version of the data}
@@ -102,15 +107,62 @@ A new \code{tidymodl} object.
 \subsection{Method \code{assemble()}}{
 Adds a results matrix
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{tidymodl$assemble(newdata = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{tidymodl$assemble(newdata, format = "long")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{newdata}}{A results matrix}
+\item{\code{newdata}}{A new data set to append. Needs to be either:
+\itemize{
+\item A vector of length equal to the number of rows in the model matrix.
+For example, the output of \code{predict()} of a \code{lm} model.
+In this case the function returns a data.frame of dimensions
+\code{c(nrow(parent), ncol(parent) + 1)}
+\item A data.frame/matrix of equal dimensions of the model matrix.
+For example, the output of \code{xgb_impute()}.
+In this case the function returns a data.frame of dimensions
+\code{c(nrow(data), ncol(data) + 1)}
+}}
+
+\item{\code{format}}{The desired format of the returned data frame, can either
+be "long" or "wide".}
 }
 \if{html}{\out{</div>}}
+}
+\subsection{Details}{
+This returns a completed data.frame for four use cases based on user
+preference of the desired format.
+\itemize{
+\item \strong{Format "long":}
+\itemize{
+\item \strong{Use Case 1 - "newdata" is a vector of length nrow(child):}
+The function returns a combined data frame of the parent data and the
+"newdata" in a new column. Useful when the user wants to append an
+output of, for example, \code{predict} for a \code{lm} regression model.
+\item \strong{Use Case 2 - "newdata" is a matrix of dimensions
+dim(child):} The function returns a data.frame of the original data in
+long format with the "newdata" in a new column. Useful when the user
+wants to append an output of, for example, \code{xgb_impute} for all original
+data.
+}
+\item \strong{Format "wide":}
+\itemize{
+\item \strong{Use Case 3 - "newdata" is a vector of length nrow(child):}
+The function returns a combined data frame of the parent data and the
+"newdata" in a new column. Useful when the user wants to append an
+output of, for example, \code{predict} for a \code{lm} regression model.
+\item \strong{Use Case 4 - "newdata" is a matrix of dimensions
+dim(child):} The function returns a data.frame of the original data in
+wide format with the "newdata" as replacing the child matrix of the
+original data. Useful when the user \emph{is only} interested in using
+the output of, for example, \code{xgb_impute} for all original data.
+}
+}
+}
+
+\subsection{Returns}{
+df A Data Frame
 }
 }
 \if{html}{\out{<hr>}}
@@ -132,6 +184,10 @@ Correlates and reurns pearson values
 \if{html}{\out{<div class="r">}}\preformatted{tidymodl$correlate()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+df A Correlation Matrix of class \code{cor_df} (see
+\href{https://cran.r-project.org/web/packages/corrr/corrr.pdf}{corrr})
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-tidymodl-xgb_impute"></a>}}
@@ -139,15 +195,21 @@ Correlates and reurns pearson values
 \subsection{Method \code{xgb_impute()}}{
 Provides high level xgboost imputation
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{tidymodl$xgb_impute(n = 5)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{tidymodl$xgb_impute(n = 5, format = "long")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{n}}{The number of cross-validation folds to perform}
+
+\item{\code{format}}{The desired format of the returned data frame, can either
+be "long" or "wide".}
 }
 \if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+df A data.frame of imputed values
 }
 }
 \if{html}{\out{<hr>}}

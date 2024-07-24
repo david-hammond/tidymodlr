@@ -10,17 +10,26 @@
 of input into modelling packages or for regression style analysis.
 }
 \details{
-In many fields #' it is common to have data in tidy long data, with
+In many fields it is common to have data in tidy long data, with
 the rows representing many #' variables, but only \strong{one}
-column representing the values (see #' \code{?wb} for an example).
+column representing the values (see \code{?wb} for an example).
 
 \code{tidymodlr} is particularly useful when the variablenames in the columns
-are long descriptive strings, for example 'Energy imports, net (\% of energy use)'.
+are long descriptive strings, for example
+'Energy imports, net (\% of energy use)'.
 In such cases a straight \verb{pivot wider} generates column names that are
-not only cumbersome, but also generate errors in many standard modelling packages
-that require \code{base} column names.
+not only cumbersome, but also generate errors in many standard
+modelling packages that require \code{base} column names.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/david-hammond/tidymodlr}
+  \item Report bugs at \url{https://github.com/david-hammond/tidymodlr/issues}
+}
+
 }
 \author{
-\strong{Maintainer}: First Last \email{first.last@example.com} (\href{https://orcid.org/YOUR-ORCID-ID}{ORCID})
+\strong{Maintainer}: David Hammond \email{anotherdavidhammond@gmail.com}
 
 }

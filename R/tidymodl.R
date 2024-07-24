@@ -1,4 +1,8 @@
+#' @title Creates a model matrix style R6 class for modelling with long tidy
+#' data
+#' @description
 #' Creates a model matrix style R6 class for modelling with long tidy data
+#'
 #'
 #' @importFrom R6 R6Class
 #' @importFrom dplyr select left_join all_of rename arrange
@@ -51,6 +55,8 @@ tidymodl <- R6::R6Class("tidymodl",
   #' Creates a new instance of this [R6][R6::R6Class] class.
   #' @field data (`data.frame()`)\cr
   #'   The original tidy long data frame
+  #' @field parent (`data.frame()`)\cr
+  #'   The parent identifiers of the original data
   #' @field child (`data.frame()`)\cr
   #'   The model matrix version of the data
   #' @field key (`data.frame()`)\cr
@@ -59,6 +65,7 @@ tidymodl <- R6::R6Class("tidymodl",
   lock_objects = FALSE,
   public = list(
     data = NULL,
+    parent = NULL,
     child = NULL,
     key = NULL,
     #' @description
@@ -71,37 +78,95 @@ tidymodl <- R6::R6Class("tidymodl",
                           pivot_column,
                           pivot_value) {
       ##CHECK FOR DUPLICATIONS
-      df = as.data.frame(df)
-      df[,pivot_column] = factor( df[,pivot_column])
+      df <- as.data.frame(df)
+      df[, pivot_column] <- factor(df[, pivot_column])
       self$data <- as.data.frame(df) |>
         arrange(eval(pivot_column))
       private$pivot_column <- pivot_column
       private$pivot_value <- pivot_value
-      self$key <- key_value_table(self$data[, private$pivot_column])
-      names(self$key)[2] = private$pivot_column
+      self$key <- make_key_value(self$data[, private$pivot_column])
+      names(self$key)[2] <- private$pivot_column
       tmp <- private$.get_dm()
       self$child <- tmp$child
-      private$parent <- tmp$parent
+      self$parent <- tmp$parent
     },
     #' @description
     #' Adds a results matrix
-    #' @param newdata A results matrix
-    assemble = function(newdata = NULL) {
-      parent <- private$parent |>
-        cbind(self$child)
-      parent <- parent |>
-        pivot_longer(!eval(names(private$parent)),
-                     names_to = "key",
-                     values_to = private$pivot_value) |>
-        left_join(self$key, by = "key") |>
-        select(-key)
-      parent <- parent[, c(names(self$data))]
+    #' @param newdata A new data set to append. Needs to be either:
+    #' \itemize{
+    #' \item A vector of length equal to the number of rows in the model matrix.
+    #' For example, the output of `predict()` of a `lm` model.
+    #' In this case the function returns a data.frame of dimensions
+    #' `c(nrow(parent), ncol(parent) + 1)`
+    #' \item A data.frame/matrix of equal dimensions of the model matrix.
+    #' For example, the output of `xgb_impute()`.
+    #' In this case the function returns a data.frame of dimensions
+    #' `c(nrow(data), ncol(data) + 1)`
+    #' }
+    #' @param format The desired format of the returned data frame, can either
+    #' be "long" or "wide".
+    #'
+    #' @details
+    #' This returns a completed data.frame for four use cases based on user
+    #' preference of the desired format.
+    #' \itemize{
+    #' \item \strong{Format "long":}
+    #' \itemize{
+    #' \item \strong{Use Case 1 - "newdata" is a vector of length nrow(child):}
+    #' The function returns a combined data frame of the parent data and the
+    #' "newdata" in a new column. Useful when the user wants to append an
+    #' output of, for example, `predict` for a `lm` regression model.
+    #' \item \strong{Use Case 2 - "newdata" is a matrix of dimensions
+    #' dim(child):} The function returns a data.frame of the original data in
+    #' long format with the "newdata" in a new column. Useful when the user
+    #' wants to append an output of, for example, `xgb_impute` for all original
+    #' data.
+    #' }
+    #' \item \strong{Format "wide":}
+    #' \itemize{
+    #' \item \strong{Use Case 3 - "newdata" is a vector of length nrow(child):}
+    #' The function returns a combined data frame of the parent data and the
+    #' "newdata" in a new column. Useful when the user wants to append an
+    #' output of, for example, `predict` for a `lm` regression model.
+    #' \item \strong{Use Case 4 - "newdata" is a matrix of dimensions
+    #' dim(child):} The function returns a data.frame of the original data in
+    #' wide format with the "newdata" as replacing the child matrix of the
+    #' original data. Useful when the user \emph{is only} interested in using
+    #' the output of, for example, `xgb_impute` for all original data.
+    #' }
+    #' }
+    #' @note Use Cases 1 and 3 return identical results.
+    #' @return df A Data Frame
+    assemble = function(newdata, format = "long") {
+      ### Perform checks
+      stopifnot("The `format` parameter needs to be either 'long' or 'wide'" =
+                  format %in% c("long", "wide"))
       if (!is.null(newdata)) {
-        if(identical(dim(newdata), dim(self$child))){
-          child <- private$parent |>
+        if (is.null(dim(newdata))) {
+          stopifnot("The length of the parameter `newdata` needs to be the same
+                      as the number of rows in the matrix model" =
+                      length(newdata) == nrow(self$child))
+        }else {
+          stopifnot("The dimensions of the parameter `newdata` needs to be the
+            same as the dimensions of the matrix model" =
+                      identical(dim(newdata),  dim(self$child)))
+        }
+      }
+      parent <- self$parent |>
+        cbind(self$child)
+      if (format == "long") {
+        parent <- parent |>
+          pivot_longer(!eval(names(self$parent)),
+                       names_to = "key",
+                       values_to = private$pivot_value) |>
+          left_join(self$key, by = "key") |>
+          select(-key)
+        parent <- parent[, c(names(self$data))]
+        if (identical(dim(newdata), dim(self$child))) {
+          child <- self$parent |>
             cbind(newdata)
           child <- child |>
-            pivot_longer(!eval(names(private$parent)),
+            pivot_longer(!eval(names(self$parent)),
                          names_to = "key",
                          values_to = "yhat") |>
             left_join(self$key, by = "key") |>
@@ -110,16 +175,12 @@ tidymodl <- R6::R6Class("tidymodl",
                                      private$pivot_value),
                              "yhat")]
           parent <- parent |> left_join(child,
-                                        by = c(names(private$parent),
+                                        by = c(names(self$parent),
                                                private$pivot_column))
           parent <- parent[, c(names(self$data), "yhat")]
-        }else{
-          if(length(newdata) == nrow(self$child)){
-            #parent = self$parent[, -c(private$pivot_column, private$pivot_value)]
-            parent = data.frame(private$parent, yhat = newdata)
-          }
         }
-
+      } else {
+        parent <- data.frame(self$parent, yhat = newdata)
       }
       return(parent)
     },
@@ -133,6 +194,8 @@ tidymodl <- R6::R6Class("tidymodl",
     },
     #' @description
     #' Correlates and reurns pearson values
+    #' @return df A Correlation Matrix of class `cor_df` (see
+    #' \href{https://cran.r-project.org/web/packages/corrr/corrr.pdf}{corrr})
     correlate = function() {
       cat("Key: \n")
       print(self$key)
@@ -143,16 +206,46 @@ tidymodl <- R6::R6Class("tidymodl",
     #' @description
     #' Provides high level xgboost imputation
     #' @param n The number of cross-validation folds to perform
-    xgb_impute = function(n = 5){
+    #' @param format The desired format of the returned data frame, can either
+    #' be "long" or "wide".
+    #' @return df A data.frame of imputed values
+    xgb_impute = function(n = 5, format = "long") {
+      stopifnot("The `format` parameter needs to be either 'long' or 'wide'" =
+                  format %in% c("long", "wide"))
       tmp <- mixgb(self$child, m = n)
       tmp <- lapply(tmp, as.data.frame)
-      tmp <- Reduce('+', tmp)/length(tmp)
-      tmp <- self$assemble(tmp)
+      tmp <- Reduce("+", tmp) / length(tmp)
+      tmp <- self$assemble(tmp, format)
+      return(tmp)
+    },
+    #' @description
+    #' Provides high level principal components imputation
+    #' @param format The desired format of the returned data frame, can either
+    #' be "long" or "wide".
+    #' @importFrom missMDA imputePCA
+    #' @return df A data.frame of imputed values
+    pca_impute = function(format = "long"){
+      stopifnot("The `format` parameter needs to be either 'long' or 'wide'" =
+                  format %in% c("long", "wide"))
+      tmp <- imputePCA(self$child)$fittedX |>
+        as.data.frame()
+      names(tmp) <- names(self$child)
+      tmp <- self$assemble(tmp, format)
+      return(tmp)
+    },
+    #' @description
+    #' Provides high level principal components analysis
+    #' @importFrom FactoMineR PCA
+    #' @return df A data.frame of imputed values
+    pca = function() {
+      tmp <- imputePCA(self$child)$fittedX |>
+        as.data.frame()
+      names(tmp) <- names(self$child)
+      tmp <- PCA(tmp)
       return(tmp)
     }
   ),
   private = list(
-    master = NULL,
     pivot_column = NULL,
     pivot_value = NULL,
     .get_dm = function() {
@@ -183,10 +276,11 @@ tidymodl <- R6::R6Class("tidymodl",
 #'
 #' @examples
 #' data(wb)
-#' key_value_table(wb$indicator)
+#' make_key_value(wb$indicator)
+#' @return df A `Key Value` table
 #' @export
 
-key_value_table = function(text) {
+make_key_value <- function(text) {
   text <- as.character(text)
   key <- data.frame(key = sort(tolower(unique(text))),
                     value = sort(unique(text)))
@@ -196,7 +290,7 @@ key_value_table = function(text) {
   key$key <- make.names(key$key)
   key$key <- make.unique(key$key)
   key$key <- abbreviate(key$key, minlength = 3)
-  key$key = gsub("\\.", "", key$key)
-  key$key = factor(key$key, key$key, ordered = T)
+  key$key <- gsub("\\.", "", key$key)
+  key$key <- factor(key$key, key$key, ordered = TRUE)
   return(key)
 }
