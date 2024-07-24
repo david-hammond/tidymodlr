@@ -35,26 +35,6 @@ test_that("correlate returns cor_df", {
   expect_s3_class(tmp, 'cor_df')
 })
 
-test_that("xgb_impute returns df", {
-  data(wb)
-  mdl <- tidymodl$new(wb,
-                      pivot_column = "indicator",
-                      pivot_value = "value")
-  tmp <-  mdl$xgb_impute()
-  expect_s3_class(tmp, 'data.frame')
-})
-
-test_that("xgb_impute returns correct values", {
-  data(wb)
-  mdl <- tidymodl$new(wb,
-                      pivot_column = "indicator",
-                      pivot_value = "value")
-  tmp <-  mdl$xgb_impute()
-  tmp <- tmp[!is.na(tmp$value), ]
-  test <- identical(round(tmp$value, 2), round(tmp$yhat, 2))
-  expect_true(test)
-})
-
 test_that("pca_impute returns correct class", {
   data(wb)
   mdl <- tidymodl$new(wb,

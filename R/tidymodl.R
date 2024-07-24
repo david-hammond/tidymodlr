@@ -9,7 +9,6 @@
 #' @importFrom tidyr pivot_wider pivot_longer complete
 #' @importFrom tm removePunctuation removeWords stopwords
 #' @importFrom corrr correlate autoplot dice
-#' @importFrom mixgb mixgb data_clean
 #' @param df A tidy long data frame
 #' @param pivot_column The column name on which the pivot will occur
 #' @param pivot_value The column name of the values to be pivotted
@@ -32,16 +31,34 @@
 #' names(dummy) = names(mdl$child)
 #' tmp <- mdl$assemble(dummy)
 #'
-#' # In built xgboost imputation function
+#' # In built correlation function
 #' mdl$correlate()
 #'
-#' \dontrun{
-#' # In built xgboost imputation function
-#' tmp <- mdl$xgb_impute()
-#'
-#' # In built principal components analysis function
+# In built principal components analysis function
 #' tmp <- mdl$pca()
-#' plot(tmp, choix = "var")}
+#' plot(tmp, choix = "var")
+#'
+#' \dontrun{
+#' # Using xgboost imputation function
+#'  set.seed(12345)
+#'  library(mixgb)
+#'  data(wb)
+#'  mdl <- tidymodl$new(wb,
+#'                      pivot_column = "indicator",
+#'                      pivot_value = "value")
+#'  tmp <- data_clean(mdl$child)
+#'  tmp <- mixgb(tmp, m = 5, verbose = TRUE)
+#'  tmp <- lapply(tmp, as.data.frame)
+#'  tmp <- Reduce("+", tmp) / length(tmp)
+#'  tmp <- mdl$assemble(tmp, format)
+#'  set.seed(NULL)
+#'
+#'  # Using mice imputation
+#'  library(mice)
+#'  mdl$child <- as.data.frame(scale(mdl$child))
+#'  imp <- mice(mdl$child , print = FALSE)
+#'  tmp <- mdl$assemble(complete(imp))
+#'}
 #' @export
 #'
 
@@ -206,32 +223,11 @@ tidymodl <- R6::R6Class("tidymodl",
       return(x)
     },
     #' @description
-    #' Provides high level xgboost imputation
-    #' @param n The number of cross-validation folds to perform
-    #' @param format The desired format of the returned data frame, can either
-    #' be "long" or "wide".
-    #' @return df A data.frame of imputed values
-    xgb_impute = function(n = 5, format = "long") {
-      set.seed(12345)
-      stopifnot("The `format` parameter needs to be either 'long' or 'wide'" =
-                  format %in% c("long", "wide"))
-      tmp <- data_clean(self$child)
-      tmp <- mixgb(tmp, m = n, verbose = TRUE)
-      tmp <- lapply(tmp, as.data.frame)
-      tmp <- Reduce("+", tmp) / length(tmp)
-      tmp <- self$assemble(tmp, format)
-      set.seed(NULL)
-      return(tmp)
-    },
-    #' @description
     #' Provides high level principal components analysis
-    #' @param n The number of cross-validation folds to perform on xbg_impute
     #' @importFrom FactoMineR PCA
     #' @return df A data.frame of imputed values
-    pca = function(n = 5) {
-      tmp <- self$xgb_impute(format = 'wide')
-      tmp <- tmp |> select(-eval(names(self$parent)))
-      tmp <- PCA(tmp, graph = FALSE)
+    pca = function() {
+      tmp <- PCA(self$child, graph = FALSE)
       return(tmp)
     }
   ),

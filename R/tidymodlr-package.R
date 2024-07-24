@@ -6,7 +6,7 @@
 #' imputation or machine learning.
 #'
 #' In many fields it is common to have data in tidy long data, with
-#' the rows representing many #' variables, but only \strong{one}
+#' the rows representing many variables, but only \strong{one}
 #' column representing the values (see \code{?wb} for an example).
 #'
 #' \code{tidymodlr} is particularly useful when the indicator names in the

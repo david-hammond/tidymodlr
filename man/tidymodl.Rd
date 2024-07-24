@@ -29,16 +29,33 @@ dummy <- matrix(runif(dm),
 names(dummy) = names(mdl$child)
 tmp <- mdl$assemble(dummy)
 
-# In built xgboost imputation function
+# In built correlation function
 mdl$correlate()
 
-\dontrun{
-# In built xgboost imputation function
-tmp <- mdl$xgb_impute()
-
-# In built principal components analysis function
 tmp <- mdl$pca()
-plot(tmp, choix = "var")}
+plot(tmp, choix = "var")
+
+\dontrun{
+# Using xgboost imputation function
+ set.seed(12345)
+ library(mixgb)
+ data(wb)
+ mdl <- tidymodl$new(wb,
+                     pivot_column = "indicator",
+                     pivot_value = "value")
+ tmp <- data_clean(mdl$child)
+ tmp <- mixgb(tmp, m = 5, verbose = TRUE)
+ tmp <- lapply(tmp, as.data.frame)
+ tmp <- Reduce("+", tmp) / length(tmp)
+ tmp <- mdl$assemble(tmp, format)
+ set.seed(NULL)
+
+ # Using mice imputation
+ library(mice)
+ mdl$child <- as.data.frame(scale(mdl$child))
+ imp <- mice(mdl$child , print = FALSE)
+ tmp <- mdl$assemble(complete(imp))
+}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -65,7 +82,6 @@ and child data.frames.}
 \item \href{#method-tidymodl-assemble}{\code{tidymodl$assemble()}}
 \item \href{#method-tidymodl-print}{\code{tidymodl$print()}}
 \item \href{#method-tidymodl-correlate}{\code{tidymodl$correlate()}}
-\item \href{#method-tidymodl-xgb_impute}{\code{tidymodl$xgb_impute()}}
 \item \href{#method-tidymodl-pca}{\code{tidymodl$pca()}}
 \item \href{#method-tidymodl-clone}{\code{tidymodl$clone()}}
 }
@@ -186,44 +202,14 @@ df A Correlation Matrix of class \code{cor_df} (see
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-tidymodl-xgb_impute"></a>}}
-\if{latex}{\out{\hypertarget{method-tidymodl-xgb_impute}{}}}
-\subsection{Method \code{xgb_impute()}}{
-Provides high level xgboost imputation
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{tidymodl$xgb_impute(n = 5, format = "long")}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{n}}{The number of cross-validation folds to perform}
-
-\item{\code{format}}{The desired format of the returned data frame, can either
-be "long" or "wide".}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-df A data.frame of imputed values
-}
-}
-\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-tidymodl-pca"></a>}}
 \if{latex}{\out{\hypertarget{method-tidymodl-pca}{}}}
 \subsection{Method \code{pca()}}{
 Provides high level principal components analysis
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{tidymodl$pca(n = 5)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{tidymodl$pca()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{n}}{The number of cross-validation folds to perform on xbg_impute}
-}
-\if{html}{\out{</div>}}
-}
 \subsection{Returns}{
 df A data.frame of imputed values
 }
