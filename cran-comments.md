@@ -44,6 +44,8 @@ On running:
 
 `devtools::check_win_devel()`
 
+I receive the one NOTE on `new submission`. Ignoring as this is a new submission.
+
 ## Test 6: Mac
 
 On running:
@@ -59,6 +61,10 @@ I run `rhub::rhub_setup` and `rhub::rhub_doctor()`
 After this all `rhub::rhub_check()` are successful except for:
 
 -   `intel` Issue Error in dyn.load(file, DLLpath = DLLpath, ...) : unable to load shared object '/github/home/R/x86_64-pc-linux-gnu-library/4.5/classInt/libs/classInt.so':
+
+    -   Ignoring as this seems to be a container issue <https://stackoverflow.com/questions/38943764/r-error-in-dyn-loadfile-dllpath-dllpath>
+
+-   `atlas` Error in dyn.load(file, DLLpath = DLLpath, ...) : unable to load shared object '/github/home/R/x86_64-pc-linux-gnu-library/4.5/mvtnorm/libs/mvtnorm.so': libmkl_gf_lp64.so.2: cannot open shared object file: No such file or directory Calls: \<Anonymous\> ... namespaceImport -\> loadNamespace -\> library.dynam -\> dyn.load
 
     -   Ignoring as this seems to be a container issue <https://stackoverflow.com/questions/38943764/r-error-in-dyn-loadfile-dllpath-dllpath>
 
