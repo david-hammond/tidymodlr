@@ -32,15 +32,16 @@
 #' names(dummy) = names(mdl$child)
 #' tmp <- mdl$assemble(dummy)
 #'
-#' #In built xgboost imputation function
+#' # In built xgboost imputation function
 #' mdl$correlate()
 #'
-#' #In built xgboost imputation function
+#' \dontrun{
+#' # In built xgboost imputation function
 #' tmp <- mdl$xgb_impute()
 #'
 #' # In built principal components analysis function
 #' tmp <- mdl$pca()
-#' plot(tmp, choix = "var")
+#' plot(tmp, choix = "var")}
 #' @export
 #'
 
@@ -73,6 +74,11 @@ tidymodl <- R6::R6Class("tidymodl",
                           pivot_value) {
       ##CHECK FOR DUPLICATIONS
       df <- as.data.frame(df)
+      test <- duplicated(df |> select(-pivot_value))
+      if(sum(test) > 0){
+        print(df[test,])
+        stop("You have duplicated data in your data.frame, check the above entires, fix and retry")
+      }
       df[, pivot_column] <- factor(df[, pivot_column])
       self$data <- as.data.frame(df) |>
         arrange(eval(pivot_column))
@@ -190,7 +196,7 @@ tidymodl <- R6::R6Class("tidymodl",
     #' @description
     #' Correlates and reurns pearson values
     #' @return df A Correlation Matrix of class `cor_df` (see
-    #' \href{https://cran.r-project.org/web/packages/corrr/corrr.pdf}{corrr})
+    #' \href{https://CRAN.R-project.org/package=corrr}{corrr})
     correlate = function() {
       cat("Key: \n")
       print(self$key)

@@ -9,7 +9,7 @@
 #' the rows representing many #' variables, but only \strong{one}
 #' column representing the values (see \code{?wb} for an example).
 #'
-#' \code{tidymodlr} is particularly useful when the variablenames in the columns
+#' \code{tidymodlr} is particularly useful when the indicator names in the columns
 #' are long descriptive strings, for example
 #' 'Energy imports, net (% of energy use)'.
 #' In such cases a straight `pivot wider` generates column names that are

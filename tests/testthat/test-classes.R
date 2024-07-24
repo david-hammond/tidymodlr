@@ -88,6 +88,14 @@ test_that("error works 2", {
   expect_error(mdl$assemble(mdl$child[, -1]))
 })
 
+test_that("error works 3", {
+  data(wb)
+  wb <- wb |> rbind(wb[1,])
+  expect_error(tidymodl$new(wb,
+                            pivot_column = "indicator",
+                            pivot_value = "value"))
+})
+
 test_that("wide works 1", {
   data(wb)
   mdl <- tidymodl$new(wb,

@@ -29,15 +29,16 @@ dummy <- matrix(runif(dm),
 names(dummy) = names(mdl$child)
 tmp <- mdl$assemble(dummy)
 
-#In built xgboost imputation function
+# In built xgboost imputation function
 mdl$correlate()
 
-#In built xgboost imputation function
+\dontrun{
+# In built xgboost imputation function
 tmp <- mdl$xgb_impute()
 
 # In built principal components analysis function
 tmp <- mdl$pca()
-plot(tmp, choix = "var")
+plot(tmp, choix = "var")}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -181,7 +182,7 @@ Correlates and reurns pearson values
 
 \subsection{Returns}{
 df A Correlation Matrix of class \code{cor_df} (see
-\href{https://cran.r-project.org/web/packages/corrr/corrr.pdf}{corrr})
+\href{https://CRAN.R-project.org/package=corrr}{corrr})
 }
 }
 \if{html}{\out{<hr>}}
