@@ -60,10 +60,8 @@ test_that("pca_impute returns correct values", {
   mdl <- tidymodl$new(wb,
                       pivot_column = "indicator",
                       pivot_value = "value")
-  tmp <-  mdl$pca_impute()
-  tmp <- tmp[!is.na(tmp$value), ]
-  test <- identical(round(tmp$value, 2), round(tmp$yhat, 2))
-  expect_true(test)
+  tmp <-  mdl$pca()
+  expect_s3_class(tmp, "PCA")
 })
 
 test_that("print works", {
@@ -100,12 +98,3 @@ test_that("wide works 1", {
   expect_true(test)
 })
 
-# test_that("wide works 2", {
-#   data(wb)
-#   mdl <- tidymodl$new(wb,
-#                       pivot_column = "indicator",
-#                       pivot_value = "value")
-#   tmp <- mdl$assemble(mdl$child, format = "wide")
-#   test <- identical(dim(mdl$parent |> cbind(mdl$child)), dim(tmp))
-#   expect_true(test)
-# })

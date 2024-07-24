@@ -30,23 +30,17 @@
 #'                 ncol = nc) |>
 #'                 data.frame()
 #' names(dummy) = names(mdl$child)
-#' tmp = mdl$assemble(dummy)
+#' tmp <- mdl$assemble(dummy)
 #'
-#' ### This is useful for imputation purposes as below
+#' #In built xgboost imputation function
+#' mdl$correlate()
 #'
-#' ### NOT RUN
-#' # Use for xgboost imputation
-#' # library(mixgb)
-#' # imp <- mixgb(mdl$child, save.models = T)
-#' # tmp <- mdl$assemble(newdata = imp$imputed[[1]])
+#' #In built xgboost imputation function
+#' tmp <- mdl$xgb_impute()
 #'
-#' ### NOT RUN
-#' # Use for mice imputation
-#' # library(mice)
-#' # imp <- mice(as.frame(scale(mdl$matrix)), print = FALSE)
-#' # tmp <- mdl$assemble(complete(imp))
-#'
-#'
+#' # In built principal components analysis function
+#' tmp <- mdl$pca()
+#' plot(tmp, choix = "var")
 #' @export
 #'
 
@@ -180,7 +174,8 @@ tidymodl <- R6::R6Class("tidymodl",
           parent <- parent[, c(names(self$data), "yhat")]
         }
       } else {
-        parent <- data.frame(self$parent, yhat = newdata)
+        parent <- self$parent |>
+          cbind(newdata)
       }
       return(parent)
     },
@@ -219,29 +214,14 @@ tidymodl <- R6::R6Class("tidymodl",
       return(tmp)
     },
     #' @description
-    #' Provides high level principal components imputation
-    #' @param format The desired format of the returned data frame, can either
-    #' be "long" or "wide".
-    #' @importFrom missMDA imputePCA
-    #' @return df A data.frame of imputed values
-    pca_impute = function(format = "long"){
-      stopifnot("The `format` parameter needs to be either 'long' or 'wide'" =
-                  format %in% c("long", "wide"))
-      tmp <- imputePCA(self$child)$fittedX |>
-        as.data.frame()
-      names(tmp) <- names(self$child)
-      tmp <- self$assemble(tmp, format)
-      return(tmp)
-    },
-    #' @description
     #' Provides high level principal components analysis
+    #' @param n The number of cross-validation folds to perform on xbg_impute
     #' @importFrom FactoMineR PCA
     #' @return df A data.frame of imputed values
-    pca = function() {
-      tmp <- imputePCA(self$child)$fittedX |>
-        as.data.frame()
-      names(tmp) <- names(self$child)
-      tmp <- PCA(tmp)
+    pca = function(n = 5) {
+      tmp <- self$xgb_impute(format = 'wide')
+      tmp <- tmp |> select(-eval(names(self$parent)))
+      tmp <- PCA(tmp, graph = FALSE)
       return(tmp)
     }
   ),

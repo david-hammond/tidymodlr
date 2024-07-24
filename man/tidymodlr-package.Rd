@@ -7,7 +7,8 @@
 \title{\code{tidymodlr}: Modelling with tidy long data}
 \description{
 \code{tidymodlr} transforms long data into a matrix form to allow for ease
-of input into modelling packages or for regression style analysis.
+of input into modelling packages for regression, principal components,
+imputation or machine learning.
 }
 \details{
 In many fields it is common to have data in tidy long data, with
@@ -20,6 +21,9 @@ are long descriptive strings, for example
 In such cases a straight \verb{pivot wider} generates column names that are
 not only cumbersome, but also generate errors in many standard
 modelling packages that require \code{base} column names.
+
+High level analysis functions for correlation, imputation and principals
+components analysis are provided.
 }
 \seealso{
 Useful links:

@@ -2,6 +2,7 @@
 
 export(make_key_value)
 export(tidymodl)
+importFrom(FactoMineR,PCA)
 importFrom(R6,R6Class)
 importFrom(corrr,autoplot)
 importFrom(corrr,correlate)

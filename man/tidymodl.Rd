@@ -27,23 +27,17 @@ dummy <- matrix(runif(dm),
                 ncol = nc) |>
                 data.frame()
 names(dummy) = names(mdl$child)
-tmp = mdl$assemble(dummy)
+tmp <- mdl$assemble(dummy)
 
-### This is useful for imputation purposes as below
+#In built xgboost imputation function
+mdl$correlate()
 
-### NOT RUN
-# Use for xgboost imputation
-# library(mixgb)
-# imp <- mixgb(mdl$child, save.models = T)
-# tmp <- mdl$assemble(newdata = imp$imputed[[1]])
+#In built xgboost imputation function
+tmp <- mdl$xgb_impute()
 
-### NOT RUN
-# Use for mice imputation
-# library(mice)
-# imp <- mice(as.frame(scale(mdl$matrix)), print = FALSE)
-# tmp <- mdl$assemble(complete(imp))
-
-
+# In built principal components analysis function
+tmp <- mdl$pca()
+plot(tmp, choix = "var")
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -71,6 +65,7 @@ and child data.frames.}
 \item \href{#method-tidymodl-print}{\code{tidymodl$print()}}
 \item \href{#method-tidymodl-correlate}{\code{tidymodl$correlate()}}
 \item \href{#method-tidymodl-xgb_impute}{\code{tidymodl$xgb_impute()}}
+\item \href{#method-tidymodl-pca}{\code{tidymodl$pca()}}
 \item \href{#method-tidymodl-clone}{\code{tidymodl$clone()}}
 }
 }
@@ -205,6 +200,26 @@ Provides high level xgboost imputation
 
 \item{\code{format}}{The desired format of the returned data frame, can either
 be "long" or "wide".}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+df A data.frame of imputed values
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-tidymodl-pca"></a>}}
+\if{latex}{\out{\hypertarget{method-tidymodl-pca}{}}}
+\subsection{Method \code{pca()}}{
+Provides high level principal components analysis
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{tidymodl$pca(n = 5)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{n}}{The number of cross-validation folds to perform on xbg_impute}
 }
 \if{html}{\out{</div>}}
 }

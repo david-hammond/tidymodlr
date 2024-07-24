@@ -1,5 +1,8 @@
 ---
 output: github_document
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -16,15 +19,20 @@ knitr::opts_chunk$set(
 # tidymodlr
 
 <!-- badges: start -->
-[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![CRAN status](https://www.r-pkg.org/badges/version/tidymodlr)](https://CRAN.R-project.org/package=tidymodlr)
+
+[![Lifecycle:
+experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/tidymodlr)](https://CRAN.R-project.org/package=tidymodlr)
+
 <!-- badges: end -->
 
 The goal of tidymodlr is to ...
 
 ## Installation
 
-You can install the development version of tidymodlr from [GitHub](https://github.com/) with:
+You can install the development version of tidymodlr from
+[GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
@@ -33,25 +41,77 @@ devtools::install_github("david-hammond/tidymodlr")
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+This is a basic example which shows you how to solve a common problem
+with long data:
 
 ```{r example}
 library(tidymodlr)
-## basic example code
+data(wb)
+head(wb)
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
+Here you can see that the format is not conducive to regression or other
+types of analysis that require wide formats. The indicator names are
+also long, making pivot_longer result in cumbersome column names. To
+assist, we build a tidymodl:
 
-```{r cars}
-summary(cars)
+```{r}
+mdl <- tidymodl$new(wb,
+                   pivot_column = "indicator",
+                  pivot_value = "value")
+print(mdl)
+
 ```
 
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this.
+This can now be used for regressions
 
-You can also embed plots, for example:
-
-```{r pressure, echo = FALSE}
-plot(pressure)
+```{r}
+### Use mdl$child for modelling
+fit <- lm(data = mdl$child, gni ~ gcu + ppt)
+summary(fit)
 ```
 
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.
+We can calculate and visualise correlations:
+
+```{r}
+#In built xgboost imputation function
+mdl$correlate()
+```
+
+We can also impute using xgbBoost:
+
+```{r}
+#In built xgboost imputation function
+tmp <- mdl$xgb_impute()
+head(tmp)
+```
+
+We can also perform principal component analysis:
+
+```{r}
+# In built principal components analysis function
+tmp <- mdl$pca()
+plot(tmp, choix = "var")
+```
+
+We can also append any data to the original data frame so long as the
+`newdata` is either:
+
+-   A vector where `length(newdata) = nrow(mdl$child)`
+-   A marix/dataframe where `identical(dim(newdata), dim(mdl$child)) == TRUE`
+
+```{r}
+
+### Can be used to add a yhat value for processed data
+
+nc <- ncol(mdl$child)
+nr <- nrow(mdl$child)
+dm <- nc * nr
+dummy <- matrix(runif(dm),
+                ncol = nc) |>
+                data.frame()
+names(dummy) = names(mdl$child)
+tmp <- mdl$assemble(dummy)
+head(tmp)
+### This is useful for imputation purposes as below
+```
