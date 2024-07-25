@@ -78,14 +78,6 @@ We can calculate and visualise correlations:
 mdl$correlate()
 ```
 
-We can also impute using xgbBoost:
-
-```{r}
-#In built xgboost imputation function
-tmp <- mdl$xgb_impute()
-head(tmp)
-```
-
 We can also perform principal component analysis:
 
 ```{r}

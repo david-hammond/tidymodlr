@@ -36,12 +36,12 @@ head(wb)
 #> # A tibble: 6 × 4
 #>   iso3c indicator          year    value
 #>   <chr> <chr>             <dbl>    <dbl>
-#> 1 AFG   Population, total  2012 30466479
-#> 2 AFG   Population, total  2011 29249157
-#> 3 AFG   Population, total  2010 28189672
-#> 4 ALB   Population, total  2012  2900401
-#> 5 ALB   Population, total  2011  2905195
-#> 6 ALB   Population, total  2010  2913021
+#> 1 DZA   Population, total  2012 37260563
+#> 2 DZA   Population, total  2011 36543541
+#> 3 DZA   Population, total  2010 35856344
+#> 4 AGO   Population, total  2012 25188292
+#> 5 AGO   Population, total  2011 24259111
+#> 6 AGO   Population, total  2010 23364185
 ```
 
 Here you can see that the format is not conducive to regression or other
@@ -64,13 +64,13 @@ print(mdl)
 #> 6 trg                      Trade (% of GDP)
 #> Matrix: 
 #> # A tibble: 5 × 6
-#>     ein          gcu   gni   icp      ppt   trg
-#>   <dbl>        <dbl> <dbl> <dbl>    <dbl> <dbl>
-#> 1  NA   19907329778.    NA  6.44 30466479  NA  
-#> 2  NA   17805098206.    NA 11.8  29249157  NA  
-#> 3  NA   15856668556.    NA  2.18 28189672  NA  
-#> 4  16.3 12319834195.    29  2.03  2900401  76.5
-#> 5  33.3 12890760315.    NA  3.43  2905195  81.2
+#>     ein           gcu   gni   icp      ppt   trg
+#>   <dbl>         <dbl> <dbl> <dbl>    <dbl> <dbl>
+#> 1 -213. 227143746076.  NA    8.89 37260563  60.8
+#> 2 -249. 218331946925.  27.6  4.52 36543541  62.2
+#> 3 -275. 177785053940.  NA    3.91 35856344  63.5
+#> 4 -590. 128052915766.  NA   10.3  25188292  91.8
+#> 5 -619. 111789747671.  NA   13.5  24259111 100.
 ```
 
 This can now be used for regressions
@@ -85,20 +85,20 @@ summary(fit)
 #> 
 #> Residuals:
 #>     Min      1Q  Median      3Q     Max 
-#> -11.625  -5.824  -1.688   4.949  27.141 
+#> -11.128  -5.515   1.219   4.132  24.701 
 #> 
 #> Coefficients:
-#>              Estimate Std. Error t value Pr(>|t|)    
-#> (Intercept) 3.598e+01  5.183e-01  69.424   <2e-16 ***
-#> gcu         8.101e-15  2.879e-13   0.028    0.978    
-#> ppt         5.235e-09  3.325e-09   1.575    0.117    
+#>               Estimate Std. Error t value Pr(>|t|)    
+#> (Intercept)  3.959e+01  1.438e+00  27.523   <2e-16 ***
+#> gcu          3.055e-12  9.031e-12   0.338    0.737    
+#> ppt         -4.177e-08  3.828e-08  -1.091    0.282    
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #> 
-#> Residual standard error: 7.62 on 244 degrees of freedom
-#>   (404 observations deleted due to missingness)
-#> Multiple R-squared:  0.01423,    Adjusted R-squared:  0.006147 
-#> F-statistic: 1.761 on 2 and 244 DF,  p-value: 0.1741
+#> Residual standard error: 7.589 on 41 degrees of freedom
+#>   (163 observations deleted due to missingness)
+#> Multiple R-squared:  0.03422,    Adjusted R-squared:  -0.01289 
+#> F-statistic: 0.7264 on 2 and 41 DF,  p-value: 0.4898
 ```
 
 We can calculate and visualise correlations:
@@ -122,41 +122,27 @@ mdl$correlate()
 <img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
 
     #> # A tibble: 6 × 7
-    #>   term      ein     gcu     gni     icp     ppt    trg
-    #>   <chr>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>  <dbl>
-    #> 1 ein   NA       0.0703 -0.0939 -0.0355  0.0434  0.132
-    #> 2 gcu    0.0703 NA       0.0649 -0.0879  0.492  -0.156
-    #> 3 gni   -0.0939  0.0649 NA      -0.0467  0.119  -0.332
-    #> 4 icp   -0.0355 -0.0879 -0.0467 NA       0.0557 -0.119
-    #> 5 ppt    0.0434  0.492   0.119   0.0557 NA      -0.154
-    #> 6 trg    0.132  -0.156  -0.332  -0.119  -0.154  NA
-
-We can also impute using xgbBoost:
-
-``` r
-#In built xgboost imputation function
-tmp <- mdl$xgb_impute()
-head(tmp)
-#> # A tibble: 6 × 5
-#>   iso3c indicator                              year    value      yhat
-#>   <chr> <chr>                                 <dbl>    <dbl>     <dbl>
-#> 1 AFG   Energy imports, net (% of energy use)  2012 NA       -1.09e- 1
-#> 2 AFG   GDP (current US$)                      2012  1.99e10  1.99e+10
-#> 3 AFG   Gini index                             2012 NA        4.34e+ 1
-#> 4 AFG   Inflation, consumer prices (annual %)  2012  6.44e 0  6.44e+ 0
-#> 5 AFG   Population, total                      2012  3.05e 7  3.05e+ 7
-#> 6 AFG   Trade (% of GDP)                       2012 NA        5.52e+ 1
-```
+    #>   term      ein     gcu     gni     icp     ppt     trg
+    #>   <chr>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>
+    #> 1 ein   NA      -0.161  -0.123   0.0364  0.0805 -0.0568
+    #> 2 gcu   -0.161  NA      -0.0786  0.0810  0.526  -0.0676
+    #> 3 gni   -0.123  -0.0786 NA      -0.216  -0.178  -0.367 
+    #> 4 icp    0.0364  0.0810 -0.216  NA       0.341  -0.231 
+    #> 5 ppt    0.0805  0.526  -0.178   0.341  NA      -0.364 
+    #> 6 trg   -0.0568 -0.0676 -0.367  -0.231  -0.364  NA
 
 We can also perform principal component analysis:
 
 ``` r
 # In built principal components analysis function
 tmp <- mdl$pca()
+#> Warning in PCA(self$child, graph = FALSE): Missing values are imputed by the
+#> mean of the variable: you should use the imputePCA function of the missMDA
+#> package
 plot(tmp, choix = "var")
 ```
 
-<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
 
 We can also append any data to the original data frame so long as the
 `newdata` is either:
@@ -179,13 +165,13 @@ names(dummy) = names(mdl$child)
 tmp <- mdl$assemble(dummy)
 head(tmp)
 #> # A tibble: 6 × 5
-#>   iso3c indicator                              year    value   yhat
-#>   <chr> <chr>                                 <dbl>    <dbl>  <dbl>
-#> 1 AFG   Energy imports, net (% of energy use)  2012 NA       0.0335
-#> 2 AFG   GDP (current US$)                      2012  1.99e10 0.400 
-#> 3 AFG   Gini index                             2012 NA       0.683 
-#> 4 AFG   Inflation, consumer prices (annual %)  2012  6.44e 0 0.702 
-#> 5 AFG   Population, total                      2012  3.05e 7 0.203 
-#> 6 AFG   Trade (% of GDP)                       2012 NA       0.288
+#>   iso3c indicator                              year    value  yhat
+#>   <chr> <chr>                                 <dbl>    <dbl> <dbl>
+#> 1 DZA   Energy imports, net (% of energy use)  2012 -2.13e 2 0.541
+#> 2 DZA   GDP (current US$)                      2012  2.27e11 0.220
+#> 3 DZA   Gini index                             2012 NA       0.952
+#> 4 DZA   Inflation, consumer prices (annual %)  2012  8.89e 0 0.638
+#> 5 DZA   Population, total                      2012  3.73e 7 0.382
+#> 6 DZA   Trade (% of GDP)                       2012  6.08e 1 0.223
 ### This is useful for imputation purposes as below
 ```
