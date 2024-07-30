@@ -224,10 +224,17 @@ tidymodl <- R6::R6Class("tidymodl",
     },
     #' @description
     #' Provides high level principal components analysis
+    #' @param impute logical() TRUE = impute missing data, FALSE =
+    #' do not impute missing data, defaults to FALSE
     #' @importFrom FactoMineR PCA
+    #' @importFrom missMDA imputePCA
     #' @return df A data.frame of imputed values
-    pca = function() {
-      tmp <- PCA(self$child, graph = FALSE)
+    pca = function(impute = FALSE) {
+      tmp <- self$child
+      if(impute){
+        tmp <- imputePCA(tmp)
+      }
+      tmp <- PCA(tmp, graph = FALSE)
       return(tmp)
     }
   ),

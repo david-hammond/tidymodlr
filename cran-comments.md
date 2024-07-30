@@ -73,3 +73,15 @@ After this all `rhub::rhub_check()` are successful except for:
     -   Ignoring again as this seems a container issue.
 
         libgfortran.so.5: cannot open shared object file: No such file or directory
+
+## Release version 1.0.0 - Resubmit
+
+Received this feedback:
+
+*The Description field should start with a capital letter. and backtick are not supported. Hence simply start "Transforms ...."*
+
+This has been implemented.
+
+*Is there some reference about the method you can add in the Description field in the form Authors (year) \<doi:10.....\>?*
+
+The package offers utilities to make modelling with long data easier. It is not the implementation of a published methodology. As such there is not a direct published paper to cite.

@@ -207,9 +207,16 @@ df A Correlation Matrix of class \code{cor_df} (see
 \subsection{Method \code{pca()}}{
 Provides high level principal components analysis
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{tidymodl$pca()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{tidymodl$pca(impute = FALSE)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{impute}}{logical() TRUE = impute missing data, FALSE = do not impute missing data, defaults to FALSE}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Returns}{
 df A data.frame of imputed values
 }

@@ -35,12 +35,21 @@ test_that("correlate returns cor_df", {
   expect_s3_class(tmp, 'cor_df')
 })
 
-test_that("pca_impute returns correct class", {
+test_that("pca returns correct class", {
   data(wb)
   mdl <- tidymodl$new(wb,
                       pivot_column = "indicator",
                       pivot_value = "value")
   tmp <-  mdl$pca()
+  expect_s3_class(tmp, "PCA")
+})
+
+test_that("pca with impute returns correct class", {
+  data(wb)
+  mdl <- tidymodl$new(wb,
+                      pivot_column = "indicator",
+                      pivot_value = "value")
+  tmp <-  mdl$pca(impute = TRUE)
   expect_s3_class(tmp, "PCA")
 })
 
