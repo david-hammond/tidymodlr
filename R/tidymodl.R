@@ -91,7 +91,7 @@ tidymodl <- R6::R6Class("tidymodl",
                           pivot_value) {
       ##CHECK FOR DUPLICATIONS
       df <- as.data.frame(df)
-      test <- duplicated(df |> select(-pivot_value))
+      test <- duplicated(df |> select(-eval(pivot_value)))
       if(sum(test) > 0){
         print(df[test,])
         stop("You have duplicated data in your data.frame, check the above
@@ -224,17 +224,11 @@ tidymodl <- R6::R6Class("tidymodl",
     },
     #' @description
     #' Provides high level principal components analysis
-    #' @param impute logical() TRUE = impute missing data, FALSE =
-    #' do not impute missing data, defaults to FALSE
     #' @importFrom FactoMineR PCA
-    #' @importFrom missMDA imputePCA
-    #' @return df A data.frame of imputed values
-    pca = function(impute = FALSE) {
-      tmp <- self$child
-      if(impute){
-        tmp <- imputePCA(tmp)
-      }
-      tmp <- PCA(tmp, graph = FALSE)
+    #' @return df A principle components of class `PCA` (see
+    #' \href{https://CRAN.R-project.org/package=FactoMineR}{FactoMineR}
+    pca = function() {
+      tmp <- PCA(self$child, graph = FALSE)
       return(tmp)
     }
   ),

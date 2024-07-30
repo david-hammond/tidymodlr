@@ -82,6 +82,6 @@ Received this feedback:
 
 This has been implemented.
 
-*Is there some reference about the method you can add in the Description field in the form Authors (year) \<doi:10.....\>?*
+*Is there some reference about the method you can add in the Description field in the form Authors (year) \<<doi:10>.....\>?*
 
 The package offers utilities to make modelling with long data easier. It is not the implementation of a published methodology. As such there is not a direct published paper to cite.

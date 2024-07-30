@@ -44,15 +44,6 @@ test_that("pca returns correct class", {
   expect_s3_class(tmp, "PCA")
 })
 
-test_that("pca with impute returns correct class", {
-  data(wb)
-  mdl <- tidymodl$new(wb,
-                      pivot_column = "indicator",
-                      pivot_value = "value")
-  tmp <-  mdl$pca(impute = TRUE)
-  expect_s3_class(tmp, "PCA")
-})
-
 test_that("print works", {
   data(wb)
   mdl <- tidymodl$new(wb,
