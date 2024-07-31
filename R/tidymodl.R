@@ -50,7 +50,7 @@
 #'  tmp <- mixgb(tmp, m = 5, verbose = TRUE)
 #'  tmp <- lapply(tmp, as.data.frame)
 #'  tmp <- Reduce("+", tmp) / length(tmp)
-#'  tmp <- mdl$assemble(tmp, format)
+#'  tmp <- mdl$assemble(tmp, format = "long")
 #'  set.seed(NULL)
 #'
 #'  # Using mice imputation
