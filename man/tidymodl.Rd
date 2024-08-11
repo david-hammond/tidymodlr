@@ -35,27 +35,6 @@ mdl$correlate()
 tmp <- mdl$pca()
 plot(tmp, choix = "var")
 
-\dontrun{
-# Using xgboost imputation function
- set.seed(12345)
- library(mixgb)
- data(wb)
- mdl <- tidymodl$new(wb,
-                     pivot_column = "indicator",
-                     pivot_value = "value")
- tmp <- data_clean(mdl$child)
- tmp <- mixgb(tmp, m = 5, verbose = TRUE)
- tmp <- lapply(tmp, as.data.frame)
- tmp <- Reduce("+", tmp) / length(tmp)
- tmp <- mdl$assemble(tmp, format)
- set.seed(NULL)
-
- # Using mice imputation
- library(mice)
- mdl$child <- as.data.frame(scale(mdl$child))
- imp <- mice(mdl$child , print = FALSE)
- tmp <- mdl$assemble(complete(imp))
-}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -191,7 +170,7 @@ Prints the key and the head matrix
 \if{html}{\out{<a id="method-tidymodl-correlate"></a>}}
 \if{latex}{\out{\hypertarget{method-tidymodl-correlate}{}}}
 \subsection{Method \code{correlate()}}{
-Correlates and reurns pearson values
+Correlates and reutrns pearson values
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{tidymodl$correlate()}\if{html}{\out{</div>}}
 }

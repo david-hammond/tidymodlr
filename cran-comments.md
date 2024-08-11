@@ -74,7 +74,7 @@ After this all `rhub::rhub_check()` are successful except for:
 
         libgfortran.so.5: cannot open shared object file: No such file or directory
 
-## Release version 1.0.0 - Resubmit
+## Release version 1.0.0 - Resubmit 1
 
 Received this feedback:
 
@@ -85,3 +85,19 @@ This has been implemented.
 *Is there some reference about the method you can add in the Description field in the form Authors (year) \<<doi:10>.....\>?*
 
 The package offers utilities to make modelling with long data easier. It is not the implementation of a published methodology. As such there is not a direct published paper to cite.
+
+## Release version 1.0.0 - Resubmit 2
+
+Received this feedback:
+
+*If there are references describing the methods in your package, please add these in the description field of your DESCRIPTION file in the form authors (year) \<doi:...\> authors (year, ISBN:...) or if those are not available: \<https:...\> with no space after 'doi:', 'https:' and angle brackets for auto-linking. (If you want to add a title as well please put it in quotes: "Title")*
+
+The package offers utilities to make modelling with long data easier. It is not the implementation of a published methodology. As such there is not a direct published paper to cite.
+
+*Please unwrap the examples if they are executable in \< 5 sec, or replace dontrun{} with \\donttest{}.*
+
+The xgboost example does take longer than 5 seconds on some computers, so replaced with \donttest{}, but this caused an error in that the tests could not find library(mixbg). In the end I just removed these examples, they are not central to the package.
+
+*\@description of the correlate() function in the tidymodlr.R file: "Correlates and reurns pearson values" --\> "Correlates and returns pearson values"*
+
+Fixed.

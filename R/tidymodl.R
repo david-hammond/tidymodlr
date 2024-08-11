@@ -38,27 +38,6 @@
 #' tmp <- mdl$pca()
 #' plot(tmp, choix = "var")
 #'
-#' \dontrun{
-#' # Using xgboost imputation function
-#'  set.seed(12345)
-#'  library(mixgb)
-#'  data(wb)
-#'  mdl <- tidymodl$new(wb,
-#'                      pivot_column = "indicator",
-#'                      pivot_value = "value")
-#'  tmp <- data_clean(mdl$child)
-#'  tmp <- mixgb(tmp, m = 5, verbose = TRUE)
-#'  tmp <- lapply(tmp, as.data.frame)
-#'  tmp <- Reduce("+", tmp) / length(tmp)
-#'  tmp <- mdl$assemble(tmp, format = "long")
-#'  set.seed(NULL)
-#'
-#'  # Using mice imputation
-#'  library(mice)
-#'  mdl$child <- as.data.frame(scale(mdl$child))
-#'  imp <- mice(mdl$child , print = FALSE)
-#'  tmp <- mdl$assemble(complete(imp))
-#'}
 #' @export
 #'
 
@@ -212,7 +191,7 @@ tidymodl <- R6::R6Class("tidymodl",
       print(head(self$child, 5))
     },
     #' @description
-    #' Correlates and reurns pearson values
+    #' Correlates and reutrns pearson values
     #' @return df A Correlation Matrix of class `cor_df` (see
     #' \href{https://CRAN.R-project.org/package=corrr}{corrr})
     correlate = function() {
